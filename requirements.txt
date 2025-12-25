@@ -1,4 +1,3 @@
 pandas
-pandas_datareader
 streamlit
 datetime
