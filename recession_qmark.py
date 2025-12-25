@@ -70,23 +70,20 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("**Data Source:** Federal Reserve Economic Data (FRED)")
 
-def fetch_fred_data(series_id, start_date, end_date, api_key=None):
+def fetch_fred_data(series_id, start_date, end_date):
     """Fetch data from FRED API"""
     url = "https://api.stlouisfed.org/fred/series/observations"
     
-    # Use demo API key or allow user to input their own
-    if api_key is None:
-        api_key = st.secrets.get("fred_api_key", "d0d2c8e46964b4dd9fafc65fe9141aa8")
+    # Your FRED API key
+    api_key = "d0d2c8e46964b4dd9fafc65fe9141aa8"
     
     params = {
         'series_id': series_id,
+        'api_key': api_key,
         'file_type': 'json',
         'observation_start': start_date,
         'observation_end': end_date
     }
-    
-    if api_key:
-        params['api_key'] = api_key
     
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -104,17 +101,6 @@ def fetch_fred_data(series_id, start_date, end_date, api_key=None):
     except Exception as e:
         return None
 
-# API Key input
-api_key_input = st.text_input(
-    "🔑 Enter your FRED API Key (get free key at https://fred.stlouisfed.org/docs/api/api_key.html)",
-    type="password",
-    help="Required for data access. Free registration at FRED."
-)
-
-if not api_key_input:
-    st.warning("⚠️ Please enter a FRED API key to fetch data. Get your free key here: https://fred.stlouisfed.org/docs/api/api_key.html")
-    st.stop()
-
 # Define date range
 end = datetime.date.today()
 start = end - datetime.timedelta(days=365)  # Get 1 year of data
@@ -124,8 +110,8 @@ end_str = end.strftime('%Y-%m-%d')
 
 # Fetch data
 with st.spinner("📡 Fetching latest Treasury yield data..."):
-    dgs10 = fetch_fred_data('DGS10', start_str, end_str, api_key_input)
-    dgs2 = fetch_fred_data('DGS2', start_str, end_str, api_key_input)
+    dgs10 = fetch_fred_data('DGS10', start_str, end_str)
+    dgs2 = fetch_fred_data('DGS2', start_str, end_str)
 
 if dgs10 is None or dgs2 is None:
     st.error("❌ Unable to fetch data from FRED. Please check your API key and try again.")
